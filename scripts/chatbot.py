@@ -10,11 +10,11 @@ import os
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-DB_HOST      = os.getenv("DB_HOST")
-DB_PORT      = os.getenv("DB_PORT")
-DB_NAME      = os.getenv("DB_NAME")
-DB_USER      = os.getenv("DB_USER")
-DB_PASSWORD  = os.getenv("DB_PASSWORD")
+DB_HOST      = os.getenv("DB_HOST", "127.0.0.1")
+DB_PORT      = int(os.getenv("DB_PORT", 5432))
+DB_NAME      = os.getenv("DB_NAME", "minerales_bot")
+DB_USER      = os.getenv("DB_USER", "admin")
+DB_PASSWORD  = os.getenv("DB_PASSWORD", "admin123")
 
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -27,7 +27,7 @@ def obtener_precios():
         port=DB_PORT,
         database=DB_NAME,
         user=DB_USER,
-        password=DB_PASSWORD
+        password=DB_PASSWORD,
     )
     df = pd.read_sql("""
         SELECT DISTINCT ON (mineral) mineral, precio, variacion_pct, fecha
@@ -54,7 +54,6 @@ def construir_contexto():
 # =============================================
 def chatbot(pregunta_usuario):
     contexto = construir_contexto()
-
     respuesta = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
@@ -78,7 +77,6 @@ def chatbot(pregunta_usuario):
         temperature=0.3,
         max_tokens=500
     )
-
     return respuesta.choices[0].message.content
 
 # =============================================
