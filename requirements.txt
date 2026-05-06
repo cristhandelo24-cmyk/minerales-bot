@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+streamlit
+psycopg2-binary
+pandas
+groq
+python-dotenv
+yfinance
+requests
